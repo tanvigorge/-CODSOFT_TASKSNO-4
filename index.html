@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f2ec">
+  <title>Reel Good — Find your next film</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f2ec;
+      --ink: #192522;
+      --muted: #69716c;
+      --line: #d8d8cf;
+      --green: #285847;
+      --lime: #d7e96c;
+      --coral: #db755a;
+      --card: #fffefa;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); }
+    button { color: inherit; font: inherit; }
+    .shell { max-width: 1440px; margin: 0 auto; padding: 0 48px 64px; }
+    header { height: 78px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-family: var(--serif); font-size: 25px; letter-spacing: 0; }
+    .brand b { color: var(--green); font-weight: 500; }
+    .header-note { color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    .hero { padding: 42px 0 38px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 30px; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; color: var(--green); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; }
+    .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--coral); }
+    h1 { margin: 12px 0 10px; font: 500 clamp(42px, 5vw, 68px)/.98 var(--serif); letter-spacing: 0; }
+    h1 em { color: var(--green); font-weight: 400; }
+    .hero-copy { margin: 0; color: var(--muted); font-size: 15px; }
+    .count-box { min-width: 150px; border-left: 1px solid var(--line); padding-left: 24px; padding-bottom: 4px; }
+    .count-box strong { display: block; font: 40px/1 var(--serif); }
+    .count-box span { display: block; margin-top: 8px; color: var(--muted); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; }
+    .workspace { display: grid; grid-template-columns: 248px minmax(0, 1fr); gap: 42px; align-items: start; }
+    aside { border-top: 2px solid var(--ink); padding-top: 17px; }
+    .side-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; }
+    .side-head h2 { margin: 0; font-size: 14px; font-weight: 700; }
+    .reset { border: 0; padding: 0; background: none; color: var(--green); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .filter-group { padding: 16px 0 18px; border-top: 1px solid var(--line); }
+    .filter-title { margin: 0 0 12px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip { min-height: 33px; padding: 0 11px; border: 1px solid #c9ccc2; border-radius: 99px; background: transparent; color: #454e49; font-size: 12px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+    .chip:hover { border-color: var(--green); }
+    .chip[aria-pressed="true"] { color: #fff; background: var(--green); border-color: var(--green); }
+    .mood-choice { width: 100%; min-height: 38px; border: 0; border-bottom: 1px solid #e8e7df; padding: 7px 2px; display: flex; justify-content: space-between; align-items: center; background: transparent; text-align: left; font-size: 13px; cursor: pointer; }
+    .mood-choice:last-child { border-bottom: 0; }
+    .mood-choice span:last-child { color: var(--muted); font-size: 11px; }
+    .mood-choice[aria-pressed="true"] { color: var(--green); font-weight: 700; }
+    .rating-row { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 12px; }
+    input[type="range"] { width: 100%; accent-color: var(--green); }
+    .range-labels { display: flex; justify-content: space-between; color: #858a83; font-size: 10px; }
+    main { min-width: 0; }
+    .results-top { min-height: 56px; border-top: 2px solid var(--ink); display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .results-title { font: 25px var(--serif); }
+    .results-title span { color: var(--muted); font: 12px var(--sans); margin-left: 8px; }
+    .sort-wrap { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
+    select { border: 0; padding: 6px 20px 6px 4px; color: var(--ink); background: transparent; font: 12px var(--sans); cursor: pointer; }
+    .film-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 18px; }
+    .film { min-width: 0; animation: arrive .35s both; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .poster { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #d8d8cc; }
+    .poster img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+    .film:hover .poster img { transform: scale(1.035); }
+    .match { position: absolute; left: 10px; top: 10px; padding: 6px 9px; background: var(--lime); color: #263320; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+    .save { position: absolute; right: 10px; top: 10px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(255,254,250,.94); display: grid; place-items: center; cursor: pointer; }
+    .save svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+    .save[aria-pressed="true"] { color: var(--green); }
+    .save[aria-pressed="true"] svg { fill: var(--lime); }
+    .film-meta { padding-top: 11px; }
+    .film-title-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .film h3 { overflow: hidden; margin: 0; font: 20px/1.1 var(--serif); text-overflow: ellipsis; white-space: nowrap; }
+    .score { color: var(--green); font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .subline { margin-top: 5px; color: var(--muted); font-size: 11px; }
+    .film-desc { min-height: 34px; margin: 8px 0 9px; color: #505a54; font-size: 12px; line-height: 1.45; }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { padding: 4px 7px; background: #e8e9e0; color: #4d5b50; font-size: 9px; text-transform: uppercase; letter-spacing: .06em; }
+    .rate-line { margin-top: 10px; display: flex; gap: 2px; align-items: center; }
+    .star { width: 19px; height: 20px; border: 0; padding: 0; background: transparent; color: #9a9d91; font-size: 16px; cursor: pointer; }
+    .star.active { color: #bf674b; }
+    .rate-hint { margin-left: 5px; color: #858a83; font-size: 10px; }
+    .empty { grid-column: 1 / -1; min-height: 260px; display: grid; place-items: center; text-align: center; color: var(--muted); }
+    .empty strong { display: block; margin-bottom: 8px; color: var(--ink); font: 24px var(--serif); }
+    .footnote { margin-top: 34px; padding-top: 14px; border-top: 1px solid var(--line); color: #777e77; font-size: 11px; }
+    @media (max-width: 1000px) { .shell { padding: 0 28px 48px; } .workspace { grid-template-columns: 215px minmax(0, 1fr); gap: 28px; } .film-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 650px) { .shell { padding: 0 18px 36px; } header { height: 64px; } .header-note { font-size: 9px; } .hero { padding: 32px 0 27px; grid-template-columns: 1fr; gap: 20px; } h1 { font-size: 46px; } .count-box { border-left: 0; padding: 0; display: flex; align-items: baseline; gap: 10px; } .count-box strong { font-size: 28px; } .count-box span { margin: 0; } .workspace { grid-template-columns: 1fr; gap: 26px; } aside { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; } .side-head { grid-column: 1 / -1; margin-bottom: 12px; } .filter-group { padding: 12px 0; } .filter-group:last-child { grid-column: 1 / -1; } .results-top { min-height: 52px; } .results-title { font-size: 22px; } .sort-wrap { gap: 3px; } .film-grid { gap: 24px 12px; } .film h3 { font-size: 18px; } .film-desc { font-size: 11px; } .save { right: 7px; top: 7px; width: 31px; height: 31px; } .match { top: 7px; left: 7px; font-size: 9px; } }
+    @media (max-width: 390px) { .film-grid { grid-template-columns: 1fr 1fr; } .film h3 { font-size: 16px; } .score { font-size: 10px; } .results-title span { display: block; margin: 3px 0 0; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">reel <b>good</b></div>
+      <div class="header-note">A little less scrolling, a little more cinema</div>
+    </header>
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">Your next movie night</div>
+        <h1 id="page-title">Find a film<br>that <em>feels right.</em></h1>
+        <p class="hero-copy">A shortlist shaped around what you love, not just what's popular.</p>
+      </div>
+      <div class="count-box"><strong id="match-count">0</strong><span>films in your mix</span></div>
+    </section>
+    <div class="workspace">
+      <aside aria-label="Recommendation preferences">
+        <div class="side-head"><h2>Tune your taste</h2><button class="reset" id="reset">Reset filters</button></div>
+        <section class="filter-group">
+          <h3 class="filter-title">Genres</h3>
+          <div class="chips" id="genre-list"></div>
+        </section>
+        <section class="filter-group">
+          <h3 class="filter-title">Tonight's mood</h3>
+          <div id="mood-list"></div>
+        </section>
+        <section class="filter-group">
+          <h3 class="filter-title">Minimum rating</h3>
+          <div class="rating-row"><input id="rating-filter" type="range" min="6" max="9" step="0.5" value="7"><output id="rating-value">7.0+</output></div>
+          <div class="range-labels"><span>Anything goes</span><span>Only the greats</span></div>
+        </section>
+      </aside>
+      <main>
+        <div class="results-top">
+          <div class="results-title">Made for you <span id="result-label">Sorted by your taste</span></div>
+          <label class="sort-wrap" for="sort-select">Sort <select id="sort-select"><option value="match">Best match</option><option value="rating">Highest rated</option><option value="year">Newest</option></select></label>
+        </div>
+        <section class="film-grid" id="film-grid" aria-live="polite"></section>
+        <div class="footnote">Your ratings help shape future picks as you go.</div>
+      </main>
+    </div>
+  </div>
+  <script>
+    const films = [
+      { id: 1, title: "Past Lives", year: 2023, rating: 7.9, genres: ["Drama", "Romance"], moods: ["Tender", "Thoughtful"], runtime: "1h 45m", description: "Two childhood friends meet again and reckon with the lives they might have shared.", image: "photo-1485846234645-a62644f84728" },
+      { id: 2, title: "The Grand Budapest Hotel", year: 2014, rating: 8.1, genres: ["Comedy", "Adventure"], moods: ["Playful", "Feel-good"], runtime: "1h 39m", description: "A legendary concierge and his protégé get caught in a very stylish caper.", image: "photo-1478720568477-152d9b164e26" },
+      { id: 3, title: "Arrival", year: 2016, rating: 7.9, genres: ["Sci-Fi", "Drama"], moods: ["Thoughtful", "Tense"], runtime: "1h 56m", description: "A linguist races to understand a visitor whose language changes everything.", image: "photo-1451187580459-43490279c0fa" },
+      { id: 4, title: "Little Women", year: 2019, rating: 7.8, genres: ["Drama", "Romance"], moods: ["Tender", "Feel-good"], runtime: "2h 15m", description: "Four sisters grow up, make art, and make their own way in the world.", image: "photo-1470252649378-9c29740c9fa8" },
+      { id: 5, title: "Knives Out", year: 2019, rating: 7.9, genres: ["Mystery", "Comedy"], moods: ["Playful", "Tense"], runtime: "2h 10m", description: "A sharp detective untangles a wealthy family's very messy secrets.", image: "photo-1519608487953-e999c86e7455" },
+      { id: 6, title: "Spirited Away", year: 2001, rating: 8.6, genres: ["Fantasy", "Adventure"], moods: ["Wonder", "Tender"], runtime: "2h 5m", description: "A young girl finds courage in a strange bathhouse for spirits.", image: "photo-1511497584788-876760111969" },
+      { id: 7, title: "The Social Network", year: 2010, rating: 7.8, genres: ["Drama"], moods: ["Tense", "Thoughtful"], runtime: "2h", description: "The dazzling, difficult beginnings of a company that changed connection.", image: "photo-1516321318423-f06f85e504b3" },
+      { id: 8, title: "Paddington 2", year: 2017, rating: 7.8, genres: ["Comedy", "Adventure"], moods: ["Feel-good", "Playful"], runtime: "1h 44m", description: "A bear with impeccable manners sets out to find the perfect present.", image: "photo-1472396961693-142e6e269027" },
+      { id: 9, title: "Eternal Sunshine", year: 2004, rating: 8.3, genres: ["Sci-Fi", "Romance", "Drama"], moods: ["Tender", "Thoughtful"], runtime: "1h 48m", description: "A couple tries to erase a love story and discovers what remains.", image: "photo-1470770841072-f978cf4d019e" },
+      { id: 10, title: "Get Out", year: 2017, rating: 7.8, genres: ["Horror", "Mystery"], moods: ["Tense", "Thoughtful"], runtime: "1h 44m", description: "A weekend visit turns into a chilling puzzle with no easy exit.", image: "photo-1500534623283-312aade485b7" },
+      { id: 11, title: "Moonrise Kingdom", year: 2012, rating: 7.8, genres: ["Adventure", "Romance"], moods: ["Playful", "Wonder"], runtime: "1h 34m", description: "Two young runaways set off an island-wide search and a small revolution.", image: "photo-1473116763249-2faaef81ccda" },
+      { id: 12, title: "The Farewell", year: 2019, rating: 7.5, genres: ["Drama", "Comedy"], moods: ["Tender", "Thoughtful"], runtime: "1h 40m", description: "A family gathers around a secret, sharing one last celebration together.", image: "photo-1511895426328-dc8714191300" }
+    ];
+    const genres = [...new Set(films.flatMap(film => film.genres))].sort();
+    const moods = ["Feel-good", "Thoughtful", "Tense", "Tender", "Playful", "Wonder"];
+    const state = { genres: new Set(["Drama", "Romance"]), mood: "Tender", minRating: 7, sort: "match", saved: new Set(), ratings: {} };
+    const grid = document.querySelector("#film-grid");
+
+    function renderControls() {
+      document.querySelector("#genre-list").innerHTML = genres.map(genre => `<button class="chip" type="button" aria-pressed="${state.genres.has(genre)}" data-genre="${genre}">${genre}</button>`).join("");
+      document.querySelector("#mood-list").innerHTML = moods.map(mood => `<button class="mood-choice" type="button" aria-pressed="${state.mood === mood}" data-mood="${mood}"><span>${mood}</span><span>${state.mood === mood ? "Selected" : ""}</span></button>`).join("");
+    }
+
+    function scoreFilm(film) {
+      let score = 0;
+      const genreMatches = film.genres.filter(genre => state.genres.has(genre)).length;
+      score += state.genres.size ? genreMatches * 20 / state.genres.size : 0;
+      if (state.mood && film.moods.includes(state.mood)) score += 35;
+      score += Math.max(0, (film.rating - 6) * 2.5);
+      score += (state.ratings[film.id] || 0) * 1.5;
+      return Math.min(99, Math.round(score));
+    }
+
+    function renderFilms() {
+      let matches = films.filter(film => film.rating >= state.minRating);
+      matches.sort((a, b) => {
+        if (state.sort === "rating") return b.rating - a.rating;
+        if (state.sort === "year") return b.year - a.year;
+        return scoreFilm(b) - scoreFilm(a) || b.rating - a.rating;
+      });
+      document.querySelector("#match-count").textContent = String(matches.length).padStart(2, "0");
+      document.querySelector("#result-label").textContent = state.genres.size || state.mood ? "Ranked around your taste" : "A few good places to start";
+      if (!matches.length) {
+        grid.innerHTML = '<div class="empty"><div><strong>No films at that rating yet.</strong>Lower the minimum to widen your mix.</div></div>';
+        return;
+      }
+      grid.innerHTML = matches.map((film, index) => `<article class="film" style="animation-delay:${Math.min(index * 35, 280)}ms">
+        <div class="poster"><img src="https://images.unsplash.com/${film.image}?auto=format&fit=crop&w=720&q=80" alt="Cinematic still for ${film.title}" loading="lazy"><span class="match">${scoreFilm(film)}% MATCH</span><button class="save" type="button" aria-label="${state.saved.has(film.id) ? "Remove" : "Save"} ${film.title}" aria-pressed="${state.saved.has(film.id)}" data-save="${film.id}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.75A1.75 1.75 0 0 1 7.75 3h8.5A1.75 1.75 0 0 1 18 4.75V21l-6-4-6 4V4.75Z" stroke-linejoin="round"/></svg></button></div>
+        <div class="film-meta"><div class="film-title-row"><h3 title="${film.title}">${film.title}</h3><span class="score">★ ${film.rating.toFixed(1)}</span></div><div class="subline">${film.year} <span aria-hidden="true">·</span> ${film.runtime}</div><p class="film-desc">${film.description}</p><div class="tag-row">${film.genres.map(genre => `<span class="tag">${genre}</span>`).join("")}</div><div class="rate-line" aria-label="Rate ${film.title}">${[1,2,3,4,5].map(value => `<button class="star ${value <= (state.ratings[film.id] || 0) ? "active" : ""}" type="button" aria-label="Rate ${value} out of 5" aria-pressed="${value === (state.ratings[film.id] || 0)}" data-rate="${film.id}" data-value="${value}">★</button>`).join("")}<span class="rate-hint">${state.ratings[film.id] ? "Your rating" : "Rate this film"}</span></div></div>
+      </article>`).join("");
+    }
+
+    renderControls();
+    renderFilms();
+    document.querySelector("#genre-list").addEventListener("click", event => {
+      const button = event.target.closest("[data-genre]");
+      if (!button) return;
+      const genre = button.dataset.genre;
+      state.genres.has(genre) ? state.genres.delete(genre) : state.genres.add(genre);
+      renderControls(); renderFilms();
+    });
+    document.querySelector("#mood-list").addEventListener("click", event => {
+      const button = event.target.closest("[data-mood]");
+      if (!button) return;
+      state.mood = state.mood === button.dataset.mood ? "" : button.dataset.mood;
+      renderControls(); renderFilms();
+    });
+    grid.addEventListener("click", event => {
+      const save = event.target.closest("[data-save]");
+      if (save) {
+        const id = Number(save.dataset.save);
+        state.saved.has(id) ? state.saved.delete(id) : state.saved.add(id);
+        renderFilms();
+        return;
+      }
+      const star = event.target.closest("[data-rate]");
+      if (star) {
+        state.ratings[star.dataset.rate] = Number(star.dataset.value);
+        renderFilms();
+      }
+    });
+    document.querySelector("#rating-filter").addEventListener("input", event => {
+      state.minRating = Number(event.target.value);
+      document.querySelector("#rating-value").textContent = `${state.minRating.toFixed(1)}+`;
+      renderFilms();
+    });
+    document.querySelector("#sort-select").addEventListener("change", event => {
+      state.sort = event.target.value;
+      renderFilms();
+    });
+    document.querySelector("#reset").addEventListener("click", () => {
+      state.genres.clear(); state.mood = ""; state.minRating = 6; state.sort = "match";
+      document.querySelector("#rating-filter").value = "6";
+      document.querySelector("#rating-value").textContent = "6.0+";
+      document.querySelector("#sort-select").value = "match";
+      renderControls(); renderFilms();
+    });
+  </script>
+</body>
+</html>
